@@ -50,7 +50,7 @@ jobs:
 
         # Docker 이미지 Build (2)
     - name: docker image build
-      run: docker build -t eolluga/eolluga-test .
+      run: docker build -t eollugaofficial@naver.com/eolluga-test .
     
     # DockerHub Login (3)
     - name: docker login 
