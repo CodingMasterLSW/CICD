@@ -58,10 +58,12 @@ jobs:
       with: 
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
-
+        
+    - name: docker Hub push
+      run: docker push eolluga/eolluga-test
 
   deploy:
-    needs: build-and-push  # 이 작업은 'build-and-push' 작업이 완료된 후 실행됩니다.
+    needs: build  
     runs-on: ubuntu-latest  # 이 작업은 최신 Ubuntu 러너에서 실행됩니다.
 
     steps:
@@ -76,7 +78,3 @@ jobs:
           docker stop myapp || true 
           docker rm myapp || true  
           docker run -d --name myapp -p 80:8080 eolluga/eolluga-test 
-
-    # Docker Hub push (4)
-    - name: docker Hub push
-      run: docker push eolluga/eolluga-test
