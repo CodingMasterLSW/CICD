@@ -59,6 +59,24 @@ jobs:
         username: ${{ secrets.DOCKERHUB_USERNAME }}
         password: ${{ secrets.DOCKERHUB_TOKEN }}
 
+
+  deploy:
+    needs: build-and-push  # 이 작업은 'build-and-push' 작업이 완료된 후 실행됩니다.
+    runs-on: ubuntu-latest  # 이 작업은 최신 Ubuntu 러너에서 실행됩니다.
+
+    steps:
+    - name: Deploy to EC2  # EC2로 배포하는 단계의 이름입니다.
+      uses: appleboy/ssh-action@master  # appleboy의 SSH 액션을 사용합니다. 이 액션을 통해 SSH 연결을 수행합니다.
+      with:
+        host: ${{ secrets.EC2_HOST }}  # GitHub Secrets에서 EC2 인스턴스의 호스트 주소를 가져옵니다.
+        username: ec2-user  # EC2 인스턴스에 접속할 사용자 이름입니다. 기본적으로 'ec2-user'로 설정됩니다.
+        key: ${{ secrets.EC2_SSH_KEY }}  # EC2 인스턴스에 접속하기 위한 SSH 키입니다. 이 키도 GitHub Secrets에서 관리됩니다.
+        script: |  # EC2 인스턴스에서 실행할 스크립트입니다.
+          docker pull eolluga/eolluga-test 
+          docker stop myapp || true 
+          docker rm myapp || true  
+          docker run -d --name myapp -p 80:8080 eolluga/eolluga-test 
+
     # Docker Hub push (4)
     - name: docker Hub push
       run: docker push eolluga/eolluga-test
